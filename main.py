@@ -30,6 +30,15 @@ class KeywordPreferences(ndb.Model):
     keywords = ndb.StringProperty(repeated=True)
     keyword_weights = ndb.FloatProperty(repeated=True)
 
+class Story(ndb.Model):
+    story_id = ndb.StringProperty()
+    program_id = ndb.StringProperty()
+    audio_url = ndb.StringProperty(indexed=False)
+    story_title = ndb.StringProperty(indexed=False)
+    text = ndb.StringProperty(indexed=False)
+    program_name = ndb.StringProperty(indexed=False)
+    tags = ndb.JsonProperty(indexed=False)
+
 class MainHandler(webapp2.RequestHandler):
     def get(self):
 
@@ -69,6 +78,8 @@ def getUserPreferences(user):
     prefs = KeywordPreferences.get_by_id(user.user_id())
     if prefs is None:
         prefs = KeywordPreferences(id=user.user_id())
+        prefs.keywords = []
+        prefs.put()
     return prefs
 
 class EditKeywordsHandler(webapp2.RequestHandler):
@@ -116,10 +127,43 @@ class ThumbsDownHandler(webapp2.RequestHandler):
         storyId = self.request.get('storyId')
         self.response.write(storyId)
 
+class InsertTestDataHandler(webapp2.RequestHandler):
+    def get(self):
+
+        jsonFile = open('story_data.json')
+        jsonStories = json.load(jsonFile)
+        jsonFile.close()
+
+        count=0
+        for jsonStory in jsonStories:
+            program_id = str(jsonStory["program_id"])
+            program_name = jsonStory["program_name"]
+            story_id = jsonStory["story_id"]
+            story_title = jsonStory["story_title"]["$text"]
+            audio_url = jsonStory["audio_url"]
+            text = jsonStory["text"]
+            tags = jsonStory["tags"]
+
+            story = Story(id=story_id
+                ,program_id=program_id
+                ,program_name=program_name
+                ,story_id=story_id
+                ,story_title=story_title
+                ,audio_url=audio_url
+                ,text=text
+                ,tags=tags
+            )
+            story.put()
+            count += 1
+            
+        self.response.write("Inserted %s records" % count)
+
+
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/edit_keywords', EditKeywordsHandler),
     ('/next', NextHandler),
     ('/thumbs-up', ThumbsUpHandler),
     ('/thumbs-down', ThumbsDownHandler),
+    ('/insert_test_data', InsertTestDataHandler),
 ], debug=True)
