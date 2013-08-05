@@ -7,7 +7,7 @@
     font-weight: normal;
     font-style: normal;
 }
-body { margin: 0; padding: 0; overflow: hidden; }
+body { margin: 0; padding: 0; overflow: hidden; font-family: sans-serif; }
 audio { position: absolute; top: 300px; }
 .stage {
     position: absolute;
@@ -51,6 +51,10 @@ audio { position: absolute; top: 300px; }
     bottom: 0;
     padding: 10px;
     box-sizing: border-box;
+    background-color: white;
+}
+.history {
+    background-color: white;
 }
 .progressOuter {
     position: relative;
@@ -120,6 +124,9 @@ audio { position: absolute; top: 300px; }
     <div class="button" id="playPause"></div>
     <div class="button" id="thumbsUp"></div>
     <div class="button" id="thumbsDown"></div>
+    <!--
+    <div class="button" id="showHistory"></div>
+    -->
     <span class="time" id="elapsedTime"></span>
     <div class="progressOuter">
         <div id="progress"></div>
