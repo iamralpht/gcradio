@@ -7,8 +7,39 @@
     font-weight: normal;
     font-style: normal;
 }
-body { margin: 0; padding: 0; }
+body { margin: 0; padding: 0; overflow: hidden; }
 audio { position: absolute; top: 300px; }
+.stage {
+    position: absolute;
+    -webkit-transform: perspective(500);
+    left: 0; top: 0; bottom: 0; right: 0;
+}
+@-webkit-keyframes incoming {
+    0% { -webkit-transform: translateX(150%); opacity: 0; }
+    100% { -webkit-transform: translateX(0px); opacity: 1; }
+}
+@-webkit-keyframes outgoing {
+    0% { -webkit-transform: translateX(0px); opacity: 1; }
+    100% { -webkit-transform: translateX(-150%); opacity: 0; }
+}
+.track {
+    position: absolute;
+    left: 25%;
+    right: 25%;
+    top: 0;
+    bottom: 0;
+    -webkit-animation-name: incoming;
+    -webkit-animation-duration: 1s;
+}
+.track .programName { font-weight: bold; }
+.track .image {
+    width: 100%;
+    height: 68%;
+    background-position: center 0%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-image: url(https://si0.twimg.com/profile_images/29139742/hasselhoff-david-photo-xl-david-hasselhoff-6210194.jpg);
+}
 .toolbar {
     -webkit-box-orient: horizontal;
     -webkit-box-align: center;
@@ -83,9 +114,7 @@ audio { position: absolute; top: 300px; }
 </head>
 <body>
 <div class="radio">
-<div id="image"></div>
-<div id="programName">Program Name</div>
-<div id="storyName"></div>
+<div class="stage" id="stage"></div>
 <div class="toolbar">
     <div class="button" id="playPause"></div>
     <div class="button" id="thumbsUp"></div>

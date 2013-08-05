@@ -4,11 +4,10 @@
 
 function Player() {
     this._mediaPlayer = document.getElementById('media');
-    this._programName = document.getElementById('programName');
-    this._storyName = document.getElementById('storyName');
     this._elapsedTime = document.getElementById('elapsedTime');
     this._totalTime = document.getElementById('totalTime');
     this._progress = document.getElementById('progress');
+    this._stage = document.getElementById('stage');
     this._storyId = 0;
     var playPause = document.getElementById('playPause');
     var thumbsUp = document.getElementById('thumbsUp');
@@ -24,6 +23,8 @@ function Player() {
     thumbsUp.addEventListener('click', this._thumbsUp.bind(this), true);
     thumbsDown.addEventListener('click', this._thumbsDown.bind(this), true);
     next.addEventListener('click', this._requestNext.bind(this), true);
+    // Animation listener to remove old tracks.
+    this._stage.addEventListener('webkitAnimationEnd', this._animationEnd.bind(this), true);
     // Go!
     this._requestNext();
 }
@@ -51,13 +52,35 @@ Player.prototype._onStateChange = function() {
     else document.body.classList.remove('playing');
 }
 Player.prototype._onNextTrack = function(trackInfo) {
-    console.log('trackInfo', trackInfo);
     this._storyId = trackInfo.story_id;
-    this._programName.innerText = trackInfo.program_name;
-    this._storyName.innerText = trackInfo.story_title;
+    var track = document.createElement('div');
+    track.className = 'track';
+    var programName = document.createElement('div');
+    programName.className = 'programName';
+    var storyName = document.createElement('div');
+    storyName.className = 'storyName';
+    var image = document.createElement('div');
+    image.className = 'image';
+    track.appendChild(image);
+    track.appendChild(programName);
+    track.appendChild(storyName);
+
+    if (trackInfo.image_url) image.style.backgroundImage = 'url(' + trackInfo.image_url + ')';
+    if (trackInfo.program_name) programName.innerText = trackInfo.program_name;
+    if (trackInfo.story_title) storyName.innerText = trackInfo.story_title;
+
+    if (this._lastTrack) this._lastTrack.style.webkitAnimationName = 'outgoing';
+    this._lastTrack = track;
+
+    this._stage.appendChild(track);
+
     this._mediaPlayer.src = trackInfo.audio_url;
-    //this._mediaPlayer.src = "http://pd.npr.org/anon.npr-mp3/wbur/media/2013/08/20130805_hereandnow_africa-st-louis.mp3";
     this._mediaPlayer.play();
+}
+Player.prototype._animationEnd = function(e) {
+    if (e.target.style.webkitAnimationName == 'outgoing') {
+        this._stage.removeChild(e.target);
+    }
 }
 Player.prototype._requestNext = function() {
     this._apiCall("GET", "/next", this._onNextTrack.bind(this));
