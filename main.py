@@ -165,7 +165,10 @@ class InsertTestDataHandler(webapp2.RequestHandler):
             story_id = jsonStory["story_id"]
             story_title = jsonStory["story_title"]["$text"]
             audio_url = jsonStory["audio_url"]
-            image_url = jsonStory["image_url"]
+            try:
+                image_url = jsonStory["image_url"]
+            except KeyError:
+                image_url = ""
             text = jsonStory["text"]
             tags = jsonStory["tags"]
 
