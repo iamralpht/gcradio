@@ -13,8 +13,17 @@ function Player() {
     var playPause = document.getElementById('playPause');
     var thumbsUp = document.getElementById('thumbsUp');
     var thumbsDown = document.getElementById('thumbsDown');
+    var next = document.getElementById('next');
     // Hook up the media events
     this._mediaPlayer.addEventListener('timeupdate', this._onProgress.bind(this));
+    this._mediaPlayer.addEventListener('playing', this._onStateChange.bind(this));
+    this._mediaPlayer.addEventListener('pause', this._onStateChange.bind(this));
+    // Hook up the buttons
+    var media = this._mediaPlayer;
+    playPause.addEventListener('click', function() { if (media.paused) media.play(); else media.pause(); }, true);
+    thumbsUp.addEventListener('click', this._thumbsUp.bind(this), true);
+    thumbsDown.addEventListener('click', this._thumbsDown.bind(this), true);
+    next.addEventListener('click', this._requestNext.bind(this), true);
     // Go!
     this._requestNext();
 }
@@ -36,7 +45,13 @@ Player.prototype._onProgress = function() {
     this._elapsedTime.innerText = formatTime(currentTime);
     this._progress.style.width = '-webkit-calc(' + (progress * 100) + '% - 8px)';
 }
+Player.prototype._onStateChange = function() {
+    var playing = !this._mediaPlayer.paused;
+    if (playing) document.body.classList.add('playing');
+    else document.body.classList.remove('playing');
+}
 Player.prototype._onNextTrack = function(trackInfo) {
+    console.log('trackInfo', trackInfo);
     this._storyId = trackInfo.storyId;
     this._programName.innerText = trackInfo.programName;
     this._storyName.innerText = trackInfo.storyName;
@@ -48,17 +63,16 @@ Player.prototype._requestNext = function() {
     this._apiCall("GET", "/next", this._onNextTrack.bind(this));
 }
 Player.prototype._thumbsUp = function() {
-    this._apiCall("POST", "/thumbs-up");
+    this._apiCall("GET", "/thumbs-up?storyId=" + this._storyId);
 }
 Player.prototype._thumbsDown = function() {
     var that = this;
-    this._apiCall("POST", "/thumbs-down",
-        function() { that._onNextTrack(); });
+    this._apiCall("GET", "/thumbs-down?storyId=" + this._storyId,
+        function() { that._requestNext(); });
 }
 Player.prototype._apiCall = function(method, url, callback) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function APICallResponse() {
-        console.log('ready state changed', xhr);
         if (xhr.readyState != 4) return;
         if (xhr.status == 200) {
             if (callback) callback(JSON.parse(xhr.responseText));

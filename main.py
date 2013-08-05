@@ -116,7 +116,8 @@ class ThumbsUpHandler(webapp2.RequestHandler):
         prefs = getUserPreferences(user)
 
         storyId = self.request.get('storyId')
-        self.response.write(storyId)
+        result = { storyId: storyId };
+        self.response.write(json.dumps(result));
 
 class ThumbsDownHandler(webapp2.RequestHandler):
     def get(self):
@@ -125,7 +126,8 @@ class ThumbsDownHandler(webapp2.RequestHandler):
         prefs = getUserPreferences(user)
 
         storyId = self.request.get('storyId')
-        self.response.write(storyId)
+        result = { storyId: storyId };
+        self.response.write(json.dumps(result));
 
 class InsertTestDataHandler(webapp2.RequestHandler):
     def get(self):

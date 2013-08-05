@@ -50,10 +50,14 @@ audio { position: absolute; top: 300px; }
     background-image: linear-gradient(0deg, rgb(92, 92, 92), rgb(206, 206, 206));
     color: white;
     line-height: 50px;
-    padding: 0px 13px;
+    padding: 0px 11px;
     box-sizing: border-box;
     border: 1px solid #808080;
     margin: 5px;
+}
+.button:active {
+    background-image: linear-gradient(0deg, rgb(92, 92, 92), rgb(206, 206, 206));
+    box-shadow: inset 0px -1px 2px white, inset 0px 1px 1px black;
 }
 #thumbsUp:before {
     content: "\e003";
@@ -65,7 +69,7 @@ audio { position: absolute; top: 300px; }
     content: "\e000";
 }
 .playing #playPause:before {
-    content: "\e000";
+    content: "\e001";
 }
 #next:before {
     content: "\e002";
@@ -93,7 +97,7 @@ audio { position: absolute; top: 300px; }
     <span class="time" id="totalTime"></span>
     <div class="button" id="next"></div>
 </div>
-<audio id="media" controls></audio>
+<audio id="media"></audio>
 </div>
 
 <script src="player.js"></script>
