@@ -57,6 +57,8 @@ class MainHandler(webapp2.RequestHandler):
             keywords = ", ".join(prefs.keywords or [])
 
             print "Prefs: %s" % prefs
+
+            self.redirect("player.html")
         else:
             username = "Guest"
 
