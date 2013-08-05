@@ -20,6 +20,7 @@ import os
 import cgi
 from google.appengine.api import users
 from google.appengine.ext import ndb
+import json
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -33,8 +34,7 @@ class KeywordPreferences(ndb.Model):
 class MainHandler(webapp2.RequestHandler):
     def get(self):
 
-        user = users.get_current_user()
-        prefs = getUserPreferences(user)
+        user, prefs = getUserPreferences()
 
         if user:
             username = user.nickname()
@@ -60,8 +60,9 @@ class MainHandler(webapp2.RequestHandler):
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render(template_values))
 
-def getUserPreferences(user):
+def getUserPreferences():
 
+    user = users.get_current_user()
     if user:
         # TODO: There should be only one result. Must be a better way
         query = KeywordPreferences.query(KeywordPreferences.user_id == user.user_id())
@@ -72,7 +73,7 @@ def getUserPreferences(user):
             prefs.user_id = user.user_id()
     else:
         prefs = KeywordPreferences()
-    return prefs
+    return user, prefs
 
 class EditKeywordsHandler(webapp2.RequestHandler):
     def post(self):
@@ -80,14 +81,43 @@ class EditKeywordsHandler(webapp2.RequestHandler):
         content = cgi.escape(self.request.get('content'))
         keywords = [x.strip() for x in content.split(",")]
 
-        user = users.get_current_user()
-        prefs = getUserPreferences(user)
+        user, prefs = getUserPreferences()
         prefs.keywords = keywords
-        print prefs.put()
+        key = prefs.put()
+        print key
 
         self.redirect("/")
+
+class NextHandler(webapp2.RequestHandler):
+    def get(self):
+        result = {
+            "storyId" : "foo",
+            "programName" : "NPR Insights",
+            "storyName" : "Episode 26: Mild voices",
+            "mediaPath" : "http://www.google.com/url?q=http%3A%2F%2Fpd.npr.org%2Fanon.npr-mp3%2Fwbur%2Fmedia%2F2013%2F08%2F20130805_hereandnow_africa-st-louis.mp3.mp3&sa=D&sntz=1&usg=AFQjCNEJd6YcPBtXU9AP0XhKO8fquKrkFw",
+            "summary" : "A thrilling look into the consistency of NPR anchors and their speaking voices.",
+        }
+        resultJson = json.dumps(result)
+        self.response.write(resultJson)
+
+class ThumbsUpHandler(webapp2.RequestHandler):
+    def get(self):
+        user, prefs = getUserPreferences()
+
+        storyId = self.request.get('storyId')
+        self.response.write(storyId)
+
+class ThumbsDownHandler(webapp2.RequestHandler):
+    def get(self):
+        user, prefs = getUserPreferences()
+
+        storyId = self.request.get('storyId')
+        self.response.write(storyId)
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/edit_keywords', EditKeywordsHandler),
+    ('/next', NextHandler),
+    ('/thumbs-up', ThumbsUpHandler),
+    ('/thumbs-down', ThumbsDownHandler),
 ], debug=True)
