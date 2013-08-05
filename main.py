@@ -17,6 +17,7 @@
 import webapp2
 import jinja2
 import os
+import cgi
 from google.appengine.api import users
 from google.appengine.ext import ndb
 
@@ -33,6 +34,7 @@ class MainHandler(webapp2.RequestHandler):
     def get(self):
 
         user = users.get_current_user()
+        prefs = getUserPreferences(user)
 
         if user:
             username = user.nickname()
@@ -40,13 +42,6 @@ class MainHandler(webapp2.RequestHandler):
             login_url = users.create_logout_url(self.request.uri)
             login_url_linktext = 'Logout'
 
-            # TODO: There should be only one result. Must be a better way
-            query = KeywordPreferences.query(KeywordPreferences.user_id == user.user_id())
-            try:
-                prefs = query.fetch(1)[0]
-            except IndexError:
-                prefs = KeywordPreferences()
-                prefs.user_id = user.user_id()
 
             print "Prefs: %s" % prefs
         else:
@@ -54,8 +49,6 @@ class MainHandler(webapp2.RequestHandler):
 
             login_url = users.create_login_url(self.request.uri)
             login_url_linktext = 'Login'
-
-            prefs = KeywordPreferences()
 
         template_values = {
             'username' : username,
@@ -67,6 +60,34 @@ class MainHandler(webapp2.RequestHandler):
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render(template_values))
 
+def getUserPreferences(user):
+
+    if user:
+        # TODO: There should be only one result. Must be a better way
+        query = KeywordPreferences.query(KeywordPreferences.user_id == user.user_id())
+        try:
+            prefs = query.fetch(1)[0]
+        except IndexError:
+            prefs = KeywordPreferences()
+            prefs.user_id = user.user_id()
+    else:
+        prefs = KeywordPreferences()
+    return prefs
+
+class EditKeywordsHandler(webapp2.RequestHandler):
+    def post(self):
+
+        content = cgi.escape(self.request.get('content'))
+        keywords = [x.strip() for x in content.split(",")]
+
+        user = users.get_current_user()
+        prefs = getUserPreferences(user)
+        prefs.keywords = keywords
+        print prefs.put()
+
+        self.redirect("/")
+
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
+    ('/edit_keywords', EditKeywordsHandler),
 ], debug=True)
