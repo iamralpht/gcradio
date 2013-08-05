@@ -37,7 +37,6 @@ programs.each do |k,v|
         
         full_text=s["textWithHtml"]["paragraph"].collect{|par| par["$text"]}.join(" ")
         clean_text=full_text.gsub!(/(<[^>]*>)|\n|\t/s) {" "}
-        puts full_text.size.to_s+" "+clean_text.size.to_s
         
         data<<{"program_id"=>v,
           "program_name"=>k,
@@ -52,7 +51,7 @@ programs.each do |k,v|
   end
 end
 
-File.open("public/stories_full_text.json","w") do |f|
+File.open("/home/erica/stories_full_text.json","w") do |f|
   f.write(data.to_json)
 end
 
