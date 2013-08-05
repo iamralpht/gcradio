@@ -43,7 +43,7 @@ programs.each do |k,v|
           "program_name"=>k,
           "story_id"=>s["id"],
           "story_title"=>s["title"],
-          "image_url"=>s["image"].first["src"],
+          "image_url"=>s["image"] ? s["image"].first["src"] : nil,
           "audio_url"=>s["audio"].first["format"]["mp4"]["$text"],
           "text"=>s["textWithHtml"]["paragraph"].collect{|par| par["$text"]}.join(" ")
         }
