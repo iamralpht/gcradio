@@ -27,6 +27,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 class KeywordPreferences(ndb.Model):
     user_id = ndb.StringProperty(indexed=True)
     keywords = ndb.StringProperty(repeated=True)
+    keyword_weights = ndb.FloatProperty(repeated=True)
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
@@ -54,6 +55,8 @@ class MainHandler(webapp2.RequestHandler):
             login_url = users.create_login_url(self.request.uri)
             login_url_linktext = 'Login'
 
+            prefs = KeywordPreferences()
+
         template_values = {
             'username' : username,
             'keywords' : ", ".join(prefs.keywords or []),
@@ -63,7 +66,6 @@ class MainHandler(webapp2.RequestHandler):
 
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render(template_values))
-
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),

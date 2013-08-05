@@ -2,29 +2,14 @@
 {% autoescape true %}
 <html>
   <body>
-  	Welcome, { username }
-    {% for greeting in greetings %}
-      {% if greeting.author %}
-        <b>{{ greeting.author.nickname() }}</b> wrote:
-      {% else %}
-       An anonymous person wrote:
-      {% endif %}
-      <blockquote>{{ greeting.content }}</blockquote>
-    {% endfor %}
+  	Welcome, {{ username }}   
 
-    <form action="/sign?guestbook_name={{ guestbook_name }}" method="post">
-      <div><textarea name="content" rows="3" cols="60"></textarea></div>
-      <div><input type="submit" value="Sign Guestbook"></div>
+    (<a href="{{ login_url|safe }}">{{ login_url_linktext }}</a>)
+
+    <form action="/edit_keywords" method="post">
+      <div><textarea name="content" rows="3" cols="60">{{ keywords }}</textarea></div>
+      <div><input type="submit" value="Update"></div>
     </form>
-
-    <hr>
-
-    <form>Guestbook name:
-      <input value="{{ guestbook_name }}" name="guestbook_name">
-      <input type="submit" value="switch">
-    </form>
-
-    <a href="{{ url|safe }}">{{ url_linktext }}</a>
 
   </body>
 </html>
