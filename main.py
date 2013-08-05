@@ -27,14 +27,14 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     extensions=['jinja2.ext.autoescape'])
 
 class KeywordPreferences(ndb.Model):
-    user_id = ndb.StringProperty(indexed=True)
     keywords = ndb.StringProperty(repeated=True)
     keyword_weights = ndb.FloatProperty(repeated=True)
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
 
-        user, prefs = getUserPreferences()
+        user = users.get_current_user()
+        prefs = getUserPreferences(user)
 
         if user:
             username = user.nickname()
@@ -42,6 +42,7 @@ class MainHandler(webapp2.RequestHandler):
             login_url = users.create_logout_url(self.request.uri)
             login_url_linktext = 'Logout'
 
+            keywords = ", ".join(prefs.keywords or [])
 
             print "Prefs: %s" % prefs
         else:
@@ -50,9 +51,11 @@ class MainHandler(webapp2.RequestHandler):
             login_url = users.create_login_url(self.request.uri)
             login_url_linktext = 'Login'
 
+            keywords = ""
+
         template_values = {
             'username' : username,
-            'keywords' : ", ".join(prefs.keywords or []),
+            'keywords' : keywords,
             'login_url': login_url,
             'login_url_linktext': login_url_linktext,
         }
@@ -60,20 +63,13 @@ class MainHandler(webapp2.RequestHandler):
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render(template_values))
 
-def getUserPreferences():
-
-    user = users.get_current_user()
-    if user:
-        # TODO: There should be only one result. Must be a better way
-        query = KeywordPreferences.query(KeywordPreferences.user_id == user.user_id())
-        try:
-            prefs = query.fetch(1)[0]
-        except IndexError:
-            prefs = KeywordPreferences()
-            prefs.user_id = user.user_id()
-    else:
-        prefs = KeywordPreferences()
-    return user, prefs
+def getUserPreferences(user):
+    if user is None:
+        return KeywordPreferences()
+    prefs = KeywordPreferences.get_by_id(user.user_id())
+    if prefs is None:
+        prefs = KeywordPreferences(id=user.user_id())
+    return prefs
 
 class EditKeywordsHandler(webapp2.RequestHandler):
     def post(self):
@@ -81,7 +77,9 @@ class EditKeywordsHandler(webapp2.RequestHandler):
         content = cgi.escape(self.request.get('content'))
         keywords = [x.strip() for x in content.split(",")]
 
-        user, prefs = getUserPreferences()
+        user = users.get_current_user()
+        prefs = getUserPreferences(user)
+
         prefs.keywords = keywords
         key = prefs.put()
         print key
@@ -102,14 +100,18 @@ class NextHandler(webapp2.RequestHandler):
 
 class ThumbsUpHandler(webapp2.RequestHandler):
     def get(self):
-        user, prefs = getUserPreferences()
+
+        user = users.get_current_user()
+        prefs = getUserPreferences(user)
 
         storyId = self.request.get('storyId')
         self.response.write(storyId)
 
 class ThumbsDownHandler(webapp2.RequestHandler):
     def get(self):
-        user, prefs = getUserPreferences()
+
+        user = users.get_current_user()
+        prefs = getUserPreferences(user)
 
         storyId = self.request.get('storyId')
         self.response.write(storyId)
