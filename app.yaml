@@ -9,6 +9,14 @@ handlers:
   static_files: favicon.ico
   upload: favicon\.ico
 
+- url: /player.html
+  static_files: player.html
+  upload: player.html
+
+- url: /player.js
+  static_files: player.js
+  upload: player.js
+
 - url: .*
   script: main.app
 
