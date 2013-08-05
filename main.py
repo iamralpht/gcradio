@@ -21,6 +21,7 @@ import cgi
 from google.appengine.api import users
 from google.appengine.ext import ndb
 import json
+import random
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -99,15 +100,20 @@ class EditKeywordsHandler(webapp2.RequestHandler):
 
 class NextHandler(webapp2.RequestHandler):
     def get(self):
-        result = {
-            "storyId" : "foo",
-            "programName" : "NPR Insights",
-            "storyName" : "Episode 26: Mild voices",
-            "mediaPath" : "http://pd.npr.org/anon.npr-mp3/wbur/media/2013/08/20130805_hereandnow_africa-st-louis.mp3",
-            "summary" : "A thrilling look into the consistency of NPR anchors and their speaking voices.",
-        }
+
+        story = self.getRandomStory()
+        result = story.to_dict()
+        
         resultJson = json.dumps(result)
         self.response.write(resultJson)
+
+    def getRandomStory(self):
+        query = Story.query()
+        stories = list(query)
+        randomIndex = random.randint(0,len(stories))
+        randomStory = stories[randomIndex]
+        return randomStory
+
 
 class ThumbsUpHandler(webapp2.RequestHandler):
     def get(self):

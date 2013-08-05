@@ -52,11 +52,11 @@ Player.prototype._onStateChange = function() {
 }
 Player.prototype._onNextTrack = function(trackInfo) {
     console.log('trackInfo', trackInfo);
-    this._storyId = trackInfo.storyId;
-    this._programName.innerText = trackInfo.programName;
-    this._storyName.innerText = trackInfo.storyName;
-    //this._mediaPlayer.src = trackInfo.mediaPath;
-    this._mediaPlayer.src = "http://pd.npr.org/anon.npr-mp3/wbur/media/2013/08/20130805_hereandnow_africa-st-louis.mp3";
+    this._storyId = trackInfo.story_id;
+    this._programName.innerText = trackInfo.program_name;
+    this._storyName.innerText = trackInfo.story_title;
+    this._mediaPlayer.src = trackInfo.audio_url;
+    //this._mediaPlayer.src = "http://pd.npr.org/anon.npr-mp3/wbur/media/2013/08/20130805_hereandnow_africa-st-louis.mp3";
     this._mediaPlayer.play();
 }
 Player.prototype._requestNext = function() {
