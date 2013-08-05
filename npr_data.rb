@@ -3,7 +3,6 @@ require 'net/http'
 require 'date'
 require 'rubygems'
 require 'json'
-require 'sanitize'
 
 date_string = ARGV.first
 
@@ -37,7 +36,7 @@ programs.each do |k,v|
         
         
         full_text=s["textWithHtml"]["paragraph"].collect{|par| par["$text"]}.join(" ")
-        clean_text=Sanitize.clean(full_text)
+        clean_text=full_text.gsub!(/(<[^>]*>)|\n|\t/s) {" "}
         puts full_text.size.to_s+" "+clean_text.size.to_s
         
         data<<{"program_id"=>v,
