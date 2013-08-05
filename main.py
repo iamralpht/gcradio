@@ -27,9 +27,10 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
     extensions=['jinja2.ext.autoescape'])
 
-class KeywordPreferences(ndb.Model):
+class UserPreferences(ndb.Model):
     keywords = ndb.StringProperty(repeated=True)
     keyword_weights = ndb.FloatProperty(repeated=True)
+    history = ndb.JsonProperty(indexed=False)
 
 class Story(ndb.Model):
     story_id = ndb.StringProperty()
@@ -76,10 +77,10 @@ class MainHandler(webapp2.RequestHandler):
 
 def getUserPreferences(user):
     if user is None:
-        return KeywordPreferences()
-    prefs = KeywordPreferences.get_by_id(user.user_id())
+        return UserPreferences()
+    prefs = UserPreferences.get_by_id(user.user_id())
     if prefs is None:
-        prefs = KeywordPreferences(id=user.user_id())
+        prefs = UserPreferences(id=user.user_id())
         prefs.keywords = []
         prefs.put()
     return prefs
@@ -119,21 +120,35 @@ class NextHandler(webapp2.RequestHandler):
 class ThumbsUpHandler(webapp2.RequestHandler):
     def get(self):
 
+        storyId = self.request.get('storyId')
+        result = {"story_id" : storyId, "status" : "thumbs-up"}
+
         user = users.get_current_user()
         prefs = getUserPreferences(user)
 
-        storyId = self.request.get('storyId')
-        result = { storyId: storyId };
+        history = prefs.history or []
+
+        history.append(result)
+        prefs.history = history
+        prefs.put()
+
         self.response.write(json.dumps(result));
 
 class ThumbsDownHandler(webapp2.RequestHandler):
     def get(self):
 
+        storyId = self.request.get('storyId')
+        result = {"story_id" : storyId, "status" : "thumbs-down"}
+
         user = users.get_current_user()
         prefs = getUserPreferences(user)
 
-        storyId = self.request.get('storyId')
-        result = { storyId: storyId };
+        history = prefs.history or []
+
+        history.append(result)
+        prefs.history = history
+        prefs.put()
+
         self.response.write(json.dumps(result));
 
 class InsertTestDataHandler(webapp2.RequestHandler):
@@ -169,6 +184,16 @@ class InsertTestDataHandler(webapp2.RequestHandler):
             
         self.response.write("Inserted %s records" % count)
 
+class HistoryHandler(webapp2.RequestHandler):
+    def get(self):
+
+        user = users.get_current_user()
+        prefs = getUserPreferences(user)
+
+        history = prefs.history
+
+        self.response.write(history)
+
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
@@ -176,5 +201,6 @@ app = webapp2.WSGIApplication([
     ('/next', NextHandler),
     ('/thumbs-up', ThumbsUpHandler),
     ('/thumbs-down', ThumbsDownHandler),
+    ('/history', HistoryHandler),
     ('/insert_test_data', InsertTestDataHandler),
 ], debug=True)
