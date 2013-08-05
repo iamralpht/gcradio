@@ -17,6 +17,10 @@ handlers:
   static_files: player.js
   upload: player.js
 
+- url: /icomoon.woff
+  static_files: icomoon.woff
+  upload: icomoon.woff
+
 - url: .*
   script: main.app
 

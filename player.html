@@ -1,9 +1,28 @@
 <html>
 <head>
 <style>
+@font-face {
+    font-family: 'icomoon';
+    src:url('icomoon.woff');
+    font-weight: normal;
+    font-style: normal;
+}
+body { margin: 0; padding: 0; }
 audio { position: absolute; top: 300px; }
-.progressOuter {
+.toolbar {
+    -webkit-box-orient: horizontal;
+    -webkit-box-align: center;
+    display: -webkit-box;
+    width: 100%;
+    border-top: 1px solid #e0e0e0;
     position: absolute;
+    bottom: 0;
+    padding: 10px;
+    box-sizing: border-box;
+}
+.progressOuter {
+    position: relative;
+    -webkit-box-flex: 1;
     width: 45%;
     height: 13px;
     border-radius: 8px;
@@ -20,20 +39,60 @@ audio { position: absolute; top: 300px; }
     background-image: linear-gradient(0deg, rgb(21, 21, 184), rgb(111, 111, 255));
     -webkit-transition: width 1s;
 }
+.button {
+    width: 50px;
+    height: 50px;
+    border-radius: 25px;
+    box-shadow: inset 0px 1px 2px white;
+    font-family: icomoon;
+    font-size: 28px;
+    font-size: 28px;
+    background-image: linear-gradient(0deg, rgb(92, 92, 92), rgb(206, 206, 206));
+    color: white;
+    line-height: 50px;
+    padding: 0px 13px;
+    box-sizing: border-box;
+    border: 1px solid #808080;
+    margin: 5px;
+}
+#thumbsUp:before {
+    content: "\e003";
+}
+#thumbsDown:before {
+    content: "\e004";
+}
+#playPause:before {
+    content: "\e000";
+}
+.playing #playPause:before {
+    content: "\e000";
+}
+#next:before {
+    content: "\e002";
+}
+.time {
+    display: inline-block;
+    width: 5em;
+    text-align: center;
+}
 </style>
 </head>
 <body>
 <div class="radio">
+<div id="image"></div>
 <div id="programName">Program Name</div>
 <div id="storyName"></div>
-<div id="elapsedTime"></div>
-<div id="totalTime"></div>
-<div class="progressOuter">
-    <div id="progress"></div>
+<div class="toolbar">
+    <div class="button" id="playPause"></div>
+    <div class="button" id="thumbsUp"></div>
+    <div class="button" id="thumbsDown"></div>
+    <span class="time" id="elapsedTime"></span>
+    <div class="progressOuter">
+        <div id="progress"></div>
+    </div>
+    <span class="time" id="totalTime"></span>
+    <div class="button" id="next"></div>
 </div>
-<div id="playPause"></div>
-<div id="thumbsUp"></div>
-<div id="thumbsDown"></div>
 <audio id="media" controls></audio>
 </div>
 

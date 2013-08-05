@@ -23,8 +23,17 @@ Player.prototype._onProgress = function() {
     var currentTime = hasData ? this._mediaPlayer.currentTime : 0;
     var duration = hasData ? this._mediaPlayer.duration : 0;
     var progress = hasData ? (currentTime / duration) : 0;
-    this._totalTime.innerText = duration;
-    this._elapsedTime.innerText = currentTime;
+
+    function formatTime(t) {
+        var rounded = Math.round(t);
+        var minutes = Math.floor(t / 60);
+        var seconds = rounded % 60;
+        if (seconds < 10) seconds = "0" + seconds;
+        return minutes + ":" + seconds;
+    }
+
+    this._totalTime.innerText = formatTime(duration);
+    this._elapsedTime.innerText = formatTime(currentTime);
     this._progress.style.width = '-webkit-calc(' + (progress * 100) + '% - 8px)';
 }
 Player.prototype._onNextTrack = function(trackInfo) {
