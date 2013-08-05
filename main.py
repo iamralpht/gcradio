@@ -35,6 +35,7 @@ class Story(ndb.Model):
     story_id = ndb.StringProperty()
     program_id = ndb.StringProperty()
     audio_url = ndb.StringProperty(indexed=False)
+    image_url = ndb.StringProperty(indexed=False)
     story_title = ndb.StringProperty(indexed=False)
     text = ndb.StringProperty(indexed=False)
     program_name = ndb.StringProperty(indexed=False)
@@ -103,7 +104,7 @@ class NextHandler(webapp2.RequestHandler):
 
         story = self.getRandomStory()
         result = story.to_dict()
-        
+
         resultJson = json.dumps(result)
         self.response.write(resultJson)
 
@@ -149,6 +150,7 @@ class InsertTestDataHandler(webapp2.RequestHandler):
             story_id = jsonStory["story_id"]
             story_title = jsonStory["story_title"]["$text"]
             audio_url = jsonStory["audio_url"]
+            image_url = jsonStory["image_url"]
             text = jsonStory["text"]
             tags = jsonStory["tags"]
 
@@ -158,6 +160,7 @@ class InsertTestDataHandler(webapp2.RequestHandler):
                 ,story_id=story_id
                 ,story_title=story_title
                 ,audio_url=audio_url
+                ,image_url=image_url
                 ,text=text
                 ,tags=tags
             )
