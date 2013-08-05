@@ -94,7 +94,7 @@ class NextHandler(webapp2.RequestHandler):
             "storyId" : "foo",
             "programName" : "NPR Insights",
             "storyName" : "Episode 26: Mild voices",
-            "mediaPath" : "http://www.google.com/url?q=http%3A%2F%2Fpd.npr.org%2Fanon.npr-mp3%2Fwbur%2Fmedia%2F2013%2F08%2F20130805_hereandnow_africa-st-louis.mp3&sa=D&sntz=1&usg=AFQjCNEJd6YcPBtXU9AP0XhKO8fquKrkFw",
+            "mediaPath" : "http://pd.npr.org/anon.npr-mp3/wbur/media/2013/08/20130805_hereandnow_africa-st-louis.mp3",
             "summary" : "A thrilling look into the consistency of NPR anchors and their speaking voices.",
         }
         resultJson = json.dumps(result)
